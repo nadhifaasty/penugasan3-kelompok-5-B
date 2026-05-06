@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
+from pydantic import BaseModel
 
 class AccountCreate(BaseModel):
     user_id: int
@@ -44,3 +45,11 @@ class AccountResponse(BaseModel):
     created_at: Optional[datetime]
     class Config:
         from_attributes = True
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
