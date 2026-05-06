@@ -1,4 +1,4 @@
-import hashlib
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.repositories.account_repository import AccountRepository
@@ -7,8 +7,13 @@ from typing import Optional
 
 repo = AccountRepository()
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
+    return pwd_context.hash(password)
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
 
 class AccountService:
 
@@ -25,20 +30,17 @@ class AccountService:
         return repo.get_by_user_id(db, user_id)
 
     def create(self, db: Session, data: AccountCreate):
-        # cek username duplikat
         existing = repo.get_by_username(db, data.username)
         if existing:
             raise HTTPException(
                 status_code=400,
                 detail="Username already taken"
             )
-        # hash password sebelum simpan
         data.password = hash_password(data.password)
         return repo.create(db, data)
 
     def update(self, db: Session, id: int, data: AccountUpdate):
         self.get_by_id(db, id)
-        # hash password baru kalau ada
         if data.password:
             data.password = hash_password(data.password)
         return repo.update(db, id, data)
