@@ -24,3 +24,6 @@ class AccountController:
 
     def delete(self, db: Session, id: int):
         return service.delete(db, id)
+    
+    def login(self, db: Session, username: str, password: str):
+        return service.login(db, username, password)

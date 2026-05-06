@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.database import get_db
 from app.controllers.account_controller import AccountController
-from app.schemas.account import AccountCreate, AccountUpdate, AccountResponse
+from app.schemas.account import AccountCreate, AccountUpdate, AccountResponse, LoginRequest, TokenResponse
 
 router     = APIRouter(prefix="/accounts", tags=["Account"])
 controller = AccountController()
@@ -36,3 +36,7 @@ def update_account(id: int, data: AccountUpdate, db: Session = Depends(get_db)):
 @router.delete("/{id}")
 def delete_account(id: int, db: Session = Depends(get_db)):
     return controller.delete(db, id)
+
+@router.post("/login", response_model=TokenResponse)
+def login(data: LoginRequest, db: Session = Depends(get_db)):
+    return controller.login(db, data.username, data.password)
