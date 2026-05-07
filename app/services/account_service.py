@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.repositories.account_repository import AccountRepository
 from app.schemas.account import AccountCreate, AccountUpdate
+from app.config import settings
 from typing import Optional
 from datetime import datetime, timedelta
 from jose import jwt
@@ -10,15 +11,12 @@ from jose import jwt
 repo = AccountRepository()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = "secret-key-kelompok-5"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -64,19 +62,12 @@ class AccountService:
     def login(self, db: Session, username: str, password: str):
         account = repo.get_by_username(db, username)
 
-        if not account:
-            raise HTTPException(status_code=401, detail="Username atau password salah")
-
-        if not verify_password(password, account.password):
+        if not account or not verify_password(password, account.password):
             raise HTTPException(status_code=401, detail="Username atau password salah")
 
         token = create_access_token({
-            "sub": str(account.id),
-            "account_id": account.id,
-            "user_id": account.user_id,
-            "role_id": account.role_id,
-            "username": account.username,
-            "email": account.email
+            "sub": account.username,
+            "user_id": account.user_id
         })
 
         return {
