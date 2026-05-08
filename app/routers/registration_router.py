@@ -4,6 +4,7 @@ from typing import List, Optional
 from app.database import get_db
 from app.controllers.registration_controller import RegistrationController
 from app.schemas.registration import RegistrationCreate, RegistrationUpdate, RegistrationResponse
+from app.dependencies.auth import get_current_user
 
 router     = APIRouter(prefix="/registrations", tags=["Registration"])
 controller = RegistrationController()
@@ -29,7 +30,11 @@ def get_by_id(id: int, db: Session = Depends(get_db)):
     return controller.get_by_id(db, id)
 
 @router.post("/", response_model=RegistrationResponse, status_code=201)
-def create(data: RegistrationCreate, db: Session = Depends(get_db)):
+def create(
+    data: RegistrationCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)  # User must be authenticated
+):
     return controller.create(db, data)
 
 @router.patch("/{id}", response_model=RegistrationResponse)

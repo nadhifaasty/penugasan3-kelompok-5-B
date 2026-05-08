@@ -67,7 +67,8 @@ class AccountService:
 
         token = create_access_token({
             "sub": account.username,
-            "user_id": account.user_id
+            "user_id": account.user_id,
+            "role_id": account.role_id  # Include role_id di JWT
         })
 
         return {
