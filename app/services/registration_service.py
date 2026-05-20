@@ -11,8 +11,8 @@ repo = RegistrationRepository()
 
 class RegistrationService:
 
-    def get_all(self, db: Session):
-        return repo.get_all(db)
+    def get_all(self, db: Session, skip: int = 0, limit: int = 100):
+        return repo.get_all(db, skip, limit)
 
     def get_by_id(self, db: Session, id: int):
         reg = repo.get_by_id(db, id)

@@ -1,4 +1,3 @@
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -13,7 +12,7 @@ controller = AccountController()
 # public endpoints
 
 @router.post("/login", response_model=TokenResponse, summary="Login dan dapatkan JWT token")
-def login(data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(data: LoginRequest, db: Session = Depends(get_db)):
     return controller.login(db, data.username, data.password)
 
 @router.post("/", response_model=AccountResponse, status_code=201, summary="Daftar akun baru")

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, field_serializer, model_validator
+from pydantic import BaseModel, field_validator, field_serializer, model_validator, computed_field
 from typing import Optional
 from datetime import datetime
 
@@ -57,6 +57,16 @@ class EventResponse(BaseModel):
     ended_at:    datetime
     created_at:  Optional[datetime]
     updated_at:  Optional[datetime]
+
+    @computed_field
+    @property
+    def title(self) -> str:
+        return self.name
+
+    @computed_field
+    @property
+    def date(self) -> str:
+        return self.started_at.strftime('%Y-%m-%d %H:%M') if isinstance(self.started_at, datetime) else str(self.started_at)
 
     @field_serializer('started_at')
     def serialize_started_at(self, value: datetime):

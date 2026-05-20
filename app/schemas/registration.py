@@ -29,7 +29,29 @@ class RegistrationResponse(BaseModel):
     id:         int
     user_id:    int
     event_id:   int
+    nama:       Optional[str] = None
+    nim:        Optional[str] = None
+    email:      Optional[str] = None
     created_at: Optional[datetime]
 
     class Config:
         from_attributes = True
+
+class FrontendRegistrationCreate(BaseModel):
+    eventId: int
+    nama:    str
+    nim:     str
+    email:   str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "eventId": 1,
+                "nama": "John Doe",
+                "nim": "12345678",
+                "email": "john@example.com"
+            }
+        }
+
+class FrontendRegistrationResponse(BaseModel):
+    message: str

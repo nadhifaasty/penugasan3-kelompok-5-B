@@ -4,8 +4,8 @@ from app.schemas.registration import RegistrationCreate, RegistrationUpdate
 
 class RegistrationRepository:
 
-    def get_all(self, db: Session):
-        return db.query(Registration).all()
+    def get_all(self, db: Session, skip: int = 0, limit: int = 100):
+        return db.query(Registration).offset(skip).limit(limit).all()
 
     def get_by_id(self, db: Session, id: int):
         return db.query(Registration).filter(
